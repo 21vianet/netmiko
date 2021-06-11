@@ -67,7 +67,7 @@ class VyOSSSH(CiscoSSHConnection):
         command_string = "commit"
 
         if comment:
-            command_string += f' comment "{comment}"'
+            command_string += ' comment "{}"'.format(comment)
 
         output = self.config_mode()
         output += self.send_command_expect(
@@ -78,7 +78,7 @@ class VyOSSSH(CiscoSSHConnection):
         )
 
         if any(x in output for x in error_marker):
-            raise ValueError(f"Commit failed with following errors:\n\n{output}")
+            raise ValueError("Commit failed with following errors:\n\n{}".format(output))
         return output
 
     def set_base_prompt(

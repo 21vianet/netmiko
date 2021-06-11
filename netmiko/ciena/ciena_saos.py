@@ -86,17 +86,17 @@ class CienaSaosFileTransfer(BaseFileTransfer):
         dest_file,
         file_system="",
         direction="put",
-        **kwargs,
+        **kwargs
     ):
         if file_system == "":
-            file_system = f"/tmp/users/{ssh_conn.username}"
+            file_system = "/tmp/users/{}".format(ssh_conn.username)
         return super().__init__(
             ssh_conn=ssh_conn,
             source_file=source_file,
             dest_file=dest_file,
             file_system=file_system,
             direction=direction,
-            **kwargs,
+            **kwargs
         )
 
     def remote_space_available(self, search_pattern=""):
@@ -108,17 +108,21 @@ class CienaSaosFileTransfer(BaseFileTransfer):
         Filesystem           1K-blocks      Used Available Use% Mounted on
         tmpfs                  1048576       648   1047928   0% /tmp
         """
-        remote_cmd = f"file vols -P {self.file_system}"
+        remote_cmd = "file vols -P {}".format(self.file_system)
         remote_output = self.ssh_ctl_chan.send_command_expect(remote_cmd)
         remote_output = remote_output.strip()
         err_msg = (
-            f"Parsing error, unexpected output from {remote_cmd}:\n{remote_output}"
+            "Parsing error, unexpected output from {}:\n{}".format(remote_cmd, remote_output)
         )
 
         # First line is the header; file_system_line is the output we care about
         header_line, filesystem_line = remote_output.splitlines()
 
-        filesystem, _, _, space_avail, *_ = header_line.split()
+        # filesystem, _, _, space_avail, *_ = header_line.split()
+        headers = header_line.split()
+        filesystem = headers[0]
+        space_avail = headers[3]
+
         if "Filesystem" != filesystem or "Avail" not in space_avail:
             # Filesystem 1K-blocks Used Available Use% Mounted on
             raise ValueError(err_msg)
@@ -143,9 +147,9 @@ class CienaSaosFileTransfer(BaseFileTransfer):
         """Check if the dest_file already exists on the file system (return boolean)."""
         if self.direction == "put":
             if not remote_cmd:
-                remote_cmd = f"file ls {self.file_system}/{self.dest_file}"
+                remote_cmd = "file ls {}/{}".format(self.file_system, self.dest_file)
             remote_out = self.ssh_ctl_chan.send_command_expect(remote_cmd)
-            search_string = re.escape(f"{self.file_system}/{self.dest_file}")
+            search_string = re.escape("{}/{}".format(self.file_system, self.dest_file))
             if "ERROR" in remote_out:
                 return False
             elif re.search(search_string, remote_out):
@@ -163,10 +167,10 @@ class CienaSaosFileTransfer(BaseFileTransfer):
             elif self.direction == "get":
                 remote_file = self.source_file
 
-        remote_file = f"{self.file_system}/{remote_file}"
+        remote_file = "{}/{}".format(self.file_system, remote_file)
 
         if not remote_cmd:
-            remote_cmd = f"file ls -l {remote_file}"
+            remote_cmd = "file ls -l {}".format(remote_file)
 
         remote_out = self.ssh_ctl_chan.send_command_expect(remote_cmd)
 
@@ -199,7 +203,7 @@ class CienaSaosFileTransfer(BaseFileTransfer):
             elif self.direction == "get":
                 remote_file = self.source_file
 
-        remote_md5_cmd = f"{base_cmd} {self.file_system}/{remote_file}"
+        remote_md5_cmd = "{} {}/{}".format(base_cmd, self.file_system, remote_file)
 
         self.ssh_ctl_chan._enter_shell()
         dest_md5 = self.ssh_ctl_chan.send_command(

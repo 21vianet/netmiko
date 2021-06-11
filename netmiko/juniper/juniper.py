@@ -164,7 +164,7 @@ class JuniperBase(BaseConnection):
         if comment:
             if '"' in comment:
                 raise ValueError("Invalid comment contains double quote")
-            comment = f'"{comment}"'
+            comment = '"{}"'.format(comment)
             command_string += " comment " + comment
 
         if and_quit:
@@ -191,7 +191,7 @@ class JuniperBase(BaseConnection):
             )
 
         if commit_marker not in output:
-            raise ValueError(f"Commit failed with the following errors:\n\n{output}")
+            raise ValueError("Commit failed with the following errors:\n\n{}".format(output))
 
         return output
 
@@ -250,7 +250,7 @@ class JuniperFileTransfer(BaseFileTransfer):
         dest_file,
         file_system="/var/tmp",
         direction="put",
-        **kwargs,
+        **kwargs
     ):
         return super().__init__(
             ssh_conn=ssh_conn,
@@ -258,7 +258,7 @@ class JuniperFileTransfer(BaseFileTransfer):
             dest_file=dest_file,
             file_system=file_system,
             direction=direction,
-            **kwargs,
+            **kwargs
         )
 
     def remote_space_available(self, search_pattern=""):
