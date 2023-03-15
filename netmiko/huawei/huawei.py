@@ -67,7 +67,7 @@ class HuaweiBase(CiscoBaseConnection):
 
         # Check that ends with a valid terminator character
         if not prompt[-1] in (pri_prompt_terminator, alt_prompt_terminator):
-            raise ValueError(f"Router prompt not found: {prompt}")
+            raise ValueError("Router prompt not found: {}".format(prompt))
 
         # Strip off any leading HRP_. characters for USGv5 HA
         prompt = re.sub(r"^HRP_.", "", prompt, flags=re.M)
@@ -76,7 +76,7 @@ class HuaweiBase(CiscoBaseConnection):
         prompt = prompt[1:-1]
         prompt = prompt.strip()
         self.base_prompt = prompt
-        log.debug(f"prompt: {self.base_prompt}")
+        log.debug("prompt: {}".format(self.base_prompt))
 
         return self.base_prompt
 
@@ -165,7 +165,7 @@ class HuaweiTelnet(HuaweiBase):
 
             except EOFError:
                 self.remote_conn.close()
-                msg = f"Login failed: {self.host}"
+                msg = "Login failed: {}".format(self.host)
                 raise NetmikoAuthenticationException(msg)
 
         # Last try to see if we already logged in
@@ -179,7 +179,7 @@ class HuaweiTelnet(HuaweiBase):
             return return_msg
 
         self.remote_conn.close()
-        msg = f"Login failed: {self.host}"
+        msg = "Login failed: {}".format(self.host)
         raise NetmikoAuthenticationException(msg)
 
 
@@ -202,7 +202,7 @@ class HuaweiVrpv8SSH(HuaweiSSH):
         command_string = "commit"
 
         if comment:
-            command_string += f' comment "{comment}"'
+            command_string += ' comment "{}"'.format(comment)
 
         output = self.config_mode()
         output += self.send_command_expect(
@@ -215,7 +215,7 @@ class HuaweiVrpv8SSH(HuaweiSSH):
         output += self.exit_config_mode()
 
         if error_marker in output:
-            raise ValueError(f"Commit failed with following errors:\n\n{output}")
+            raise ValueError("Commit failed with following errors:\n\n{}".format(output))
         return output
 
     def save_config(self, *args, **kwargs):

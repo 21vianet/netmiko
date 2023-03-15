@@ -135,7 +135,7 @@ class FlexvnfSSH(BaseConnection):
         if comment:
             if '"' in comment:
                 raise ValueError("Invalid comment contains double quote")
-            comment = f'"{comment}"'
+            comment = '"{}"'.format(comment)
             command_string += " comment " + comment
 
         if and_quit:
@@ -162,7 +162,7 @@ class FlexvnfSSH(BaseConnection):
             )
 
         if commit_marker not in output:
-            raise ValueError(f"Commit failed with the following errors:\n\n{output}")
+            raise ValueError("Commit failed with the following errors:\n\n{}".format(output))
 
         return output
 

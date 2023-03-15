@@ -126,7 +126,7 @@ class LinuxFileTransfer(CiscoFileTransfer):
         dest_file,
         file_system="/var/tmp",
         direction="put",
-        **kwargs,
+        **kwargs
     ):
         return super().__init__(
             ssh_conn=ssh_conn,
@@ -134,7 +134,7 @@ class LinuxFileTransfer(CiscoFileTransfer):
             dest_file=dest_file,
             file_system=file_system,
             direction=direction,
-            **kwargs,
+            **kwargs
         )
 
     def remote_space_available(self, search_pattern=""):
@@ -157,7 +157,7 @@ class LinuxFileTransfer(CiscoFileTransfer):
                 remote_file = self.dest_file
             elif self.direction == "get":
                 remote_file = self.source_file
-        remote_md5_cmd = f"{base_cmd} {self.file_system}/{remote_file}"
+        remote_md5_cmd = "{} {}/{}".format(base_cmd, self.file_system, remote_file)
         dest_md5 = self.ssh_ctl_chan.send_command(
             remote_md5_cmd, max_loops=750, delay_factor=2
         )
